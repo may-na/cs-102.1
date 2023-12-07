@@ -1,10 +1,15 @@
 class Cinema:
     
-    def __init__(self, films, history):
+    """
+    Класс, содержаший функции, реализующие подбор фильмов по вкусам 
+    """
+
+    def __init__(self, films, history, user_views):
         self.films_file = films
         self.history_file = history
         self.films = self.load_films()
         self.history = self.load_history()
+        self.user_views = list(map(int, user_views.split(',')))
 
     def load_films(self):
         films = {}
@@ -22,20 +27,16 @@ class Cinema:
                 history.append(viewed_films)
         return history
 
-    def get_user_views(self):
-        user_input = input("Введите список просмотренных фильмов (через запятую): ")
-        user_views = list(map(int, user_input.split(',')))
-        return user_views
-
     def filter_users(self, user_views):
         filtered_users = []
         for user in self.history:
             user_set = set(user)
-            if len(user_set.intersection(user_views)) >= len(user_views) / 2:
+            if len(user_set.intersection(self.user_views)) >= len(self.user_views) / 2:
                 filtered_users.append(user)
         return filtered_users
 
     def exclude_watched_films(self, user_views, filtered_users):
+        user_views = self.user_views
         unwatched_films = []
         for user in filtered_users:
             for movie in user:
@@ -44,7 +45,7 @@ class Cinema:
         return unwatched_films
 
     def recommend_movie(self):
-        user_views = self.get_user_views()
+        user_views = self.user_views
         filtered_users = self.filter_users(user_views)
         unwatched_films = self.exclude_watched_films(user_views, filtered_users)
 
@@ -62,5 +63,6 @@ class Cinema:
 
 films_file = 'src/lab4/films.txt'
 history_file = 'src/lab4/history.txt'
-recommendation_service = Cinema(films_file, history_file)
+user_views = '1, 2'
+recommendation_service = Cinema(films_file, history_file, user_views)
 recommendation_service.recommend_movie()
